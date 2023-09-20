@@ -9,8 +9,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <script href="" type="application/javascript"></script>
     <title>GEOSERVER TEST</title>
+    <script src="/lib/js/ol-v3.20.1/build/ol.js" type="application/javascript"></script>
+    <script>
+
+    </script>
 </head>
 <body>
     <h2>${paramGeo}</h2>
