@@ -3,3 +3,5 @@ spring:
     view: # 뷰 경로 설정
       prefix: /WEB-INF/views/
       suffix: .jsp
+server:
+  port: 80
