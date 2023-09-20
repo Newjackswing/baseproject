@@ -3,5 +3,9 @@ spring:
     view: # 뷰 경로 설정
       prefix: /WEB-INF/views/
       suffix: .jsp
+  devtools: # 수정시 라이브 리로드
+    livereload:
+      enabled: true
 server:
   port: 80
+
