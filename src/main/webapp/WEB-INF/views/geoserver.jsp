@@ -9,7 +9,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-
+    <script href="" type="application/javascript"></script>
     <title>GEOSERVER TEST</title>
 </head>
 <body>
