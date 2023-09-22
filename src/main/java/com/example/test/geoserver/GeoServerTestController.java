@@ -17,7 +17,7 @@ public class GeoServerTestController {
             HttpServletResponse response,
             Model model
     ){
-        model.addAttribute("paramGeo", "HELLO GEOSERVER");
+        model.addAttribute("paramGeo", "Geoserver prototype");
         return "/geoserver";
     }
 }
