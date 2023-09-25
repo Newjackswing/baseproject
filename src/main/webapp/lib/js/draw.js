@@ -3,16 +3,63 @@ var layers;
 var geoserverBaseUrl = 'http://localhost:8080/geoserver';
 var draw;
 
-/* draw 관련 */
-var raster = new ol.layer.Tile({
-	source: new ol.source.OSM()
-});
+
+
+/* 도형그리기 */
 var source = new ol.source.Vector({wrapX: false});
-var vector = new ol.layer.Vector({
-	source: source
+var vectorDraw = new ol.layer.Vector({
+	source: source,
+	style: new ol.style.Style({
+		stroke: new ol.style.Stroke({
+			color: 'red', // 테두리 색상을 빨간색으로 설정
+			width: 2 // 테두리 두께
+		}),
+		fill: new ol.style.Fill({
+			color: 'rgba(255, 0, 0, 0.2)' // 다각형 내부 색상 및 투명도 설정
+		})
+	})
 });
+/* OSM 배경지도 */
+var OSM = new ol.layer.Tile({
+		// 일반적인 사용자 지정 타일을 삽입할 때 사용하는 코드입니다.
+		// 오픈스트리트맵 공식 지도 타일을 이용할 때는 ol.source.XYZ(...) 대신
+		// new ol.source.OSM()을 삽입하는 것만으로도 충분합니다.
+		source: new ol.source.XYZ({
+			attributions: [
+				ol.source.OSM.ATTRIBUTION,
+				'Tiles courtesy of ' +
+				'<a href="http://openstreetmap.org">' +
+				'OpenStreetMap' +
+				'</a>'
+			],
+			url: 'https://tiles.osm.kr/hot/{z}/{x}/{y}.png'
+		})
+	});
 
+var waterPipe = /* 수도관로 */
+		new ol.layer.Tile({
+			source: new ol.source.TileWMS({
+				url: geoserverBaseUrl+'/kwater/wms', // GeoServer의 WMS URL
+				params: {
+					'LAYERS': 'wtl_pipe_lm_3000000000_u', // 첫 번째 레이어 이름
+					'TILED': true
+				},
+				serverType: 'geoserver'
+			})
+		});
 
+var manhole = /* 맨홀 */
+	new ol.layer.Tile({
+		source: new ol.source.TileWMS({
+			url: geoserverBaseUrl+'/kwater/wms', // GeoServer의 WMS URL
+			params: {
+				'LAYERS': 'manhole', // 맨홀
+				// layers=kwater%3Aw_etc_depthgroundwater_wgs_p
+				'TILED': true
+			},
+			serverType: 'geoserver'
+		})
+	});
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -21,49 +68,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initMap() {
 	var layer1Checkbox = document.getElementById('layer1Checkbox');
+
 	layers = new ol.layer.Group({
-		layers: [ vector,
+		layers: [
 			/* OSM */
-			new ol.layer.Tile({
-				// 일반적인 사용자 지정 타일을 삽입할 때 사용하는 코드입니다.
-				// 오픈스트리트맵 공식 지도 타일을 이용할 때는 ol.source.XYZ(...) 대신
-				// new ol.source.OSM()을 삽입하는 것만으로도 충분합니다.
-				source: new ol.source.XYZ({
-					attributions: [
-						ol.source.OSM.ATTRIBUTION,
-						'Tiles courtesy of ' +
-						'<a href="http://openstreetmap.org">' +
-						'OpenStreetMap' +
-						'</a>'
-					],
-					url: 'https://tiles.osm.kr/hot/{z}/{x}/{y}.png'
-				})
-			}),
-			/* 수도관로 */
-			new ol.layer.Tile({
-				source: new ol.source.TileWMS({
-					url: geoserverBaseUrl+'/kwater/wms', // GeoServer의 WMS URL
-					params: {
-						'LAYERS': 'wtl_pipe_lm_3000000000_u', // 첫 번째 레이어 이름
-						'TILED': true
-					},
-					serverType: 'geoserver'
-				})
-			}),
-			/*  */
-			new ol.layer.Tile({
-				source: new ol.source.TileWMS({
-					url: geoserverBaseUrl+'/kwater/wms', // GeoServer의 WMS URL
-					params: {
-						'LAYERS': 'manhole', // 맨홀
-						// layers=kwater%3Aw_etc_depthgroundwater_wgs_p
-						'TILED': true
-					},
-					serverType: 'geoserver'
-				})
-			})
+			OSM,
+			waterPipe,
+			manhole,
+			vectorDraw
+
 		]
 	});
+
+	/* 그리기 벡터 레이어 추가 */
+	// source = new ol.source.Vector();
+	// var vector = new ol.layer.Vector({
+	// 	source: source
+	// });
+	// map.addLayer(vector);
 
 	map = new ol.Map({
 		layers: [
@@ -103,49 +125,39 @@ function initMap() {
 			}
 		}
 
+	});
 
 
+
+	// 버튼 클릭 시 그리기 도구 준비
+	var drawButton = document.getElementById('draw-button');
+	drawButton.addEventListener('click', function () {
+		startDrawing();
 	});
 }
 
-function drawClickEvent (){
-	map.removeInteraction(draw);
-	addInteraction();
-};
 
-// function addInteraction() {
-// 	draw = new ol.interaction.Draw({
-// 		source: source,
-// 		type: /** @type {ol.geom.GeometryType} */ ('Polygon')
-// 	});
-// 	map.addInteraction(draw);
-// }
+function startDrawing() {
+	if (draw) {
+		map.removeInteraction(draw);
+	}
 
-function addInteraction() {
+	// 이미 그려진 도형이 있으면 해당 도형 삭제
+	source.clear();
+
+	// polygon 그리기 도구 준비
 	draw = new ol.interaction.Draw({
 		source: source,
-		type: 'Polygon'
+		type: 'Polygon',
+		// freehand: false, // 더블클릭으로의 그리기 종료 비활성화
+		// finishCondition: ol.events.condition.doubleClick // 더블클릭으로 그리기 종료
 	});
+
 	map.addInteraction(draw);
 
-	// 다각형 그리기가 완료되면 공간 쿼리 실행
-	draw.on('drawend', function (event) {
+	// 그리기가 완료되면 이벤트 처리
+	draw.once('drawend', function (event) {
 		var feature = event.feature;
-		var geometry = feature.getGeometry().getCoordinates();
-
-		// GeoServer 공간 쿼리 설정 (다각형 내의 도형 정보를 가져오는 적절한 레이어 및 필터 설정 필요)
-		var geoServerUrl = geoserverBaseUrl+'/wfs?' +
-			'service=WFS&version=2.0.0&request=GetFeature&typeName=wtl_pipe_lm_3000000000_u' +
-			'&outputFormat=application/json&' +
-			'CQL_FILTER=INTERSECTS(geometry, POLYGON((' +
-			geometry[0].join(' ') + ', ' +
-			geometry[0].join(', ') + ')))';
-
-		// 공간 쿼리 실행 및 결과를 콘솔에 출력
-		fetch(geoServerUrl)
-			.then(response => response.json())
-			.then(data => {
-				console.log('Features within the drawn polygon:', data);
-			});
+		map.removeInteraction(draw); // 그리기 이벤트 종료
 	});
 }

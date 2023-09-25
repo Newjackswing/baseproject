@@ -13,13 +13,13 @@
     <%-- openlayers css와 js 라이브러리 추가 --%>
     <link href="/lib/ol-v3.20.1/css/ol.css" rel="stylesheet">
     <script src="/lib/ol-v3.20.1/build/ol.js" type="application/javascript"></script>
+    <script src="/lib/js/draw.js" type="application/javascript"></script>
     <style>
         .map {
             height: 600px;
             width: 100%;
         }
     </style>
-    <script src="/lib/js/draw.js" type="application/javascript"></script>
 </head>
 <body>
     <h2>${paramGeo}</h2>
@@ -28,7 +28,7 @@
         <label for="layer1Checkbox">수도관로</label>
     </div>
     <div>
-        <button id="draw-button" onclick="drawClickEvent();">다각형 그리기</button>
+        <button id="draw-button" >다각형 그리기</button>
     </div>
     <div id="map" class="map"></div>
 </body>
