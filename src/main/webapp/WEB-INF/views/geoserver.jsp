@@ -16,7 +16,7 @@
     <script src="/lib/js/draw.js" type="application/javascript"></script>
     <style>
         .map {
-            height: 600px;
+            height: 80%;
             width: 100%;
         }
     </style>
@@ -29,6 +29,15 @@
     </div>
     <div>
         <button id="draw-button" >다각형 그리기</button>
+    </div>
+    <div>
+        <select id="selectCity" onchange="changeCity(this.value);">
+            <option value="30000">대전시</option>
+            <option value="36110">세종시</option>
+            <option value="44825">태안</option>
+            <option value="43111">청주</option>
+            <option value="42790">??</option>
+        </select>
     </div>
     <div id="map" class="map"></div>
 </body>
