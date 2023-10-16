@@ -64,15 +64,28 @@ var manhole = /* 맨홀 */
 		})
 	});
 
-var wtl_national = new ol.layer.Tile({
-	source : new ol.source.TileWMS({
-		url : geoserverBaseUrl+'/kwater/wms',
-		// https://kwatergeo.com:8443/geoserver/gwc/kwater:wtl_national_line?gridSet=EPSG:4326&format=image/png
-		params : {
-			'LAYERS' : 'kwater:wtl_national_line',
-			'TILED' : true
-		},
-		serverType : 'geoserver'
+// var wtl_national = new ol.layer.Tile({
+// 	source : new ol.source.TileWMS({
+// 		url : geoserverBaseUrl+'/kwater/wms',
+// 		// https://kwatergeo.com:8443/geoserver/gwc/kwater:wtl_national_line?gridSet=EPSG:4326&format=image/png
+// 		params : {
+// 			'LAYERS' : 'kwater:wtl_national_line',
+// 			'TILED' : true
+// 		},
+// 		serverType : 'geoserver'
+// 	})
+// });
+
+var wtl_national = new ol.layer.Image({
+	source: new ol.source.ImageWMS({
+		ratio: 1,
+		url: 'https://kwatergeo.com:8443/geoserver/kwater/wms',
+		params: {'FORMAT': 'image/png',
+			'VERSION': '1.1.1',
+			"STYLES": '',
+			"LAYERS": 'kwater:index_wtl_national_line',
+			"exceptions": 'application/vnd.ogc.se_inimage',
+		}
 	})
 });
 
